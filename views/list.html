@@ -1,0 +1,48 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>{{data['title']}}</title>
+  <meta name="description" content="">
+  <link rel="stylesheet" href="/css/bootstrap.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+		<h1>{{data['title']}}</h1>
+    <hr />
+    </header>
+    <div id="main">
+    %if data['toplevel']:
+      <p><a href="/?path={{ data['toplevel'] }}">..</a></p>
+    %end
+    %for row in data['output']:
+      <p>
+      <img src="/img/icons/{{ row["type"] }}.png" />
+      <a href="/?path={{ row['path'] }}">{{ row['name'] }}</a>
+      </p>
+    %end
+    </div>
+    <footer>
+		created by <a href="//inlanger.org.ua">inlanger</a>
+    </footer>
+  </div> <!--! end of .container -->
+
+
+  <!-- JavaScript at the bottom for fast page loading -->
+
+  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="/js/jquery-1.6.2.min.js"><\/script>')</script>
+  <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  <!--[if lt IE 7 ]>
+    <script defer src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script defer>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+
+</body>
+</html>
