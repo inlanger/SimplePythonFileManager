@@ -19,10 +19,14 @@
     %if data['toplevel']:
       <p><a href="/?path={{ data['toplevel'] }}">..</a></p>
     %end
-    %for row in data['output']:
+    %for row in data['output']:      
       <p>
       <img src="/img/icons/{{ row["type"] }}.png" />
+      %if row["type"] == 'folder':
       <a href="/?path={{ row['path'] }}">{{ row['name'] }}</a>
+      %else:
+      <a href="/download?path={{ row['path'] }}">{{ row['name'] }}</a>
+      %end
       </p>
     %end
     </div>

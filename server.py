@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from bottle import *
-import sys, os
+import sys, os, time
 
 app = Bottle()
 full_path = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -41,7 +41,12 @@ def get_file_type(filename):
         else:
             type_file = 'unknow'
         return type_file
-    
+
+# Some code from https://github.com/herrerae/mia
+def date_file(path):
+    path = request.GET.get('path')
+    tiempo = time.gmtime(os.path.getmtime(path))
+    return time.strftime("%d/%m/%Y-%H:%M:%S", tiempo)
 
 @app.route('/img/:filename')
 def img_static(filename):
@@ -73,6 +78,7 @@ def list():
     else:
         toplevel = False
     dirList = os.listdir(full_path + path)
+    dirList.sort()
     output = []
     for item in dirList:
         if item == 'server.py' or item == 'bottle.py' or item == 'bottle.pyc' or item == '.folderinfo' or item == 'views':
