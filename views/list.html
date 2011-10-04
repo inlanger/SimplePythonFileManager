@@ -5,9 +5,18 @@
 
   <title>{{data['title']}}</title>
   <meta name="description" content="">
+  <link rel="stylesheet" href="/css/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
   <link rel="stylesheet" href="/css/bootstrap.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.fancybox-1.3.4.pack.js"></script>
+  <script type="text/javascript" src="/js/jquery.easing-1.3.pack.js"></script>
+  <script type="text/javascript" src="/js/bootstrap-alerts.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("a.fancybox").fancybox();
+  });
+  </script>
 </head>
-
 <body>
 
   <div class="container">
@@ -15,6 +24,25 @@
 		<h1>{{data['title']}}</h1>
     <hr />
     </header>
+    %if data['error'] == 'badpass':
+    <div class="alert-message error">
+      <a class="close" href="#">×</a>
+      <p><strong>Неправильный пароль!</strong> Пожалуйста, попробуйте еще раз.</p>
+    </div>
+    %end
+    %if data['error'] == 'empty':
+    <div class="alert-message error">
+      <a class="close" href="#">×</a>
+      <p><strong>Введите логин и пароль!</strong></p>
+    </div>
+    %end
+    %if data['error'] == 'badlogin':
+    <div class="alert-message error">
+      <a class="close" href="#">×</a>
+      <p><strong>Неправильный логин!</strong> Пожалуйста, попробуйте еще раз.</p>
+    </div>
+    %end
+    %if data['login'] and data['password']:
     <div id="main">
     %if data['toplevel']:
       <p><a href="/?path={{ data['toplevel'] }}">..</a></p>
@@ -26,10 +54,22 @@
       <a href="/?path={{ row['path'] }}">{{ row['name'] }}</a>
       %else:
       <a href="/download?path={{ row['path'] }}">{{ row['name'] }}</a>
+      %if row["type"] == 'imagen':
+      <a href="/img/view?path={{ row['path'] }}" class="fancybox"><img src="/img/icons/image_view.png" /></a>
+      %end
       %end
       </p>
     %end
     </div>
+    %else:
+    <div>
+      <form action="/login" method="POST">
+        Логин: <br /><input name="login" type="text" /><br />
+        Пароль: <br /><input name="password" type="password" /><br />
+        <input type="submit" value="Войти!">
+      </from>
+    </div>
+    %end
     <footer>
 		created by <a href="//inlanger.org.ua">inlanger</a>
     </footer>
@@ -37,9 +77,6 @@
 
 
   <!-- JavaScript at the bottom for fast page loading -->
-
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="/js/jquery-1.6.2.min.js"><\/script>')</script>
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
        chromium.org/developers/how-tos/chrome-frame-getting-started -->

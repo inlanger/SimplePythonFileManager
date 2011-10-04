@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from bottle import *
-import sys, os, time
+import sys, os, time, md5
 
 app = Bottle()
 full_path = os.path.abspath(os.path.dirname(sys.argv[0]))
+accounts = {"test": "test", "test2": "test2"}
+
 
 # Some code from https://github.com/herrerae/mia
 def get_file_type(filename):
@@ -48,13 +50,50 @@ def date_file(path):
     tiempo = time.gmtime(os.path.getmtime(path))
     return time.strftime("%d/%m/%Y-%H:%M:%S", tiempo)
 
+@app.post('/login')
+def login():
+    login = request.forms.get('login')
+    password = request.forms.get('password')
+    if not login or not password:
+        redirect("/?error=empty")
+    if login in accounts:
+        if accounts[login] == password:
+            hash = md5.new()
+            hash.update(password)
+            response.set_cookie("login", login)
+            response.set_cookie("password", hash.hexdigest())
+            print "OK"
+            redirect("/")
+        else:
+            print "Неправильный пароль!"
+            redirect("/?error=badpass")
+    else:
+        print "Нет такого логина"
+        redirect("/?error=badlogin")
+    return ""
+
+@app.route('/logout')
+def logout():
+    response.set_cookie("login", "")
+    response.set_cookie("password", "")
+    redirect("/")
+
 @app.route('/img/:filename')
 def img_static(filename):
     return static_file(filename, root=full_path+'/views/static/img/')
 
+@app.route('/img/view')
+def view_img_static():
+    filename = request.GET.get('path')
+    return static_file(filename, root=full_path)
+
 @app.route('/img/icons/:filename')
 def icons_static(filename):
     return static_file(filename, root=full_path+'/views/static/img/icons/')
+
+@app.route('/img/fancybox/:filename')
+def fancybox_static(filename):
+    return static_file(filename, root=full_path+'/views/static/img/fancybox/')
 
 @app.route('/js/:filename')
 def js_static(filename):
@@ -89,7 +128,7 @@ def list():
             else:
                 filepath = path + "/" + item
             output.append({"name": item, "path": filepath, "type": get_file_type(item)})
-    data = {"title": "Список файлов " + path, "full_path": full_path, "path": path, "list": dirList, "toplevel": toplevel, "output": output}
+    data = {"title": "Список файлов " + path, "full_path": full_path, "path": path, "list": dirList, "toplevel": toplevel, "output": output, "login": request.get_cookie("login"), "password": request.get_cookie("password"), "error": request.GET.get('error')}
     return dict(data=data)
 
 @app.route('/download')
