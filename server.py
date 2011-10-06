@@ -46,9 +46,27 @@ def get_file_type(filename):
 
 # Some code from https://github.com/herrerae/mia
 def date_file(path):
-    path = request.GET.get('path')
     tiempo = time.gmtime(os.path.getmtime(path))
-    return time.strftime("%d/%m/%Y-%H:%M:%S", tiempo)
+    return time.strftime("%d.%m.%Y %H:%M:%S", tiempo)
+
+# Some code from https://github.com/herrerae/mia
+def convert_bytes(path):
+    bytes = float(os.path.getsize(path))
+    if bytes >= 1099511627776:
+        terabytes = bytes / 1099511627776
+        size = '%.2f Tb' % terabytes
+    elif bytes >= 1073741824:
+        gigabytes = bytes / 1073741824
+        size = '%.2f Gb' % gigabytes
+    elif bytes >= 1048576:
+        megabytes = bytes / 1048576
+        size = '%.2f Mb' % megabytes
+    elif bytes >= 1024:
+        kilobytes = bytes / 1024
+        size = '%.2f Kb' % kilobytes
+    else:
+        size = '%.2f Byte' % bytes
+    return size
 
 @app.post('/login')
 def login():
@@ -106,6 +124,8 @@ def css_static(filename):
 @app.route('/')
 @view('list')
 def list():
+    for header in response.headers:
+        print header
     path = request.GET.get('path')
     if not path:
         path = '/'
@@ -127,7 +147,7 @@ def list():
                 filepath = path + item
             else:
                 filepath = path + "/" + item
-            output.append({"name": item, "path": filepath, "type": get_file_type(item)})
+            output.append({"name": item, "path": filepath, "type": get_file_type(item), "date": date_file(full_path + filepath), "size": convert_bytes(full_path + filepath)})
     data = {"title": "Список файлов " + path, "full_path": full_path, "path": path, "list": dirList, "toplevel": toplevel, "output": output, "login": request.get_cookie("login"), "password": request.get_cookie("password"), "error": request.GET.get('error')}
     return dict(data=data)
 
